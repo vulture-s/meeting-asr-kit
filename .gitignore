@@ -1,0 +1,32 @@
+# 🔴 白名單制（ignore everything, then un-ignore）。
+#
+# 為什麼不是黑名單：黑名單只擋「想到的那些」。2026-09-11 的獨立審計盤點過
+# 舊版漏掉的：`lines.jsonl.bak`（工具自己會寫）、`.tmp`、`*.vtt`、`*.tsv`、
+# `*.md` 逐字稿、`*.aac/.flac/.opus/.mp4/.mov`、`*.log`，
+# 以及任何不叫 `golden/` 的素材資料夾名。
+#
+# 這個 repo 的紅線是「**錄音與人工標註永不進版控**」。白名單制之下，
+# 忘記列的東西**不會意外外流** —— 那是相反方向的失敗，代價低得多。
+
+# 先全部忽略
+*
+!*/
+
+# 再逐項放行
+!.gitignore
+!LICENSE
+!README.md
+!*.py
+!docs/
+!docs/**/*.md
+!docs/**/*.png
+
+# 例外中的例外：快取與暫存不要
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+.DS_Store
