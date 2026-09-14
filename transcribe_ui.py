@@ -574,12 +574,27 @@ cv.addEventListener('pointermove',e=>{if(DRAG)seekFromEvent(e);});
 cv.addEventListener('pointerup',e=>{DRAG=false;});
 cv.addEventListener('pointercancel',()=>{DRAG=false;});
 window.addEventListener('resize',draw);
-(function tick(){draw();requestAnimationFrame(tick);})();
+
+/* 🔴 波形只在「有東西變了」的時候重畫。
+   原本是 (function tick(){draw();requestAnimationFrame(tick);})(); ——
+   無條件每格重畫、永遠不停。沒在播放、選取沒變、視窗沒動也照畫 60fps，
+   而聽打一坐就是 1.5 小時 ⇒ 整場都在燒 CPU 與電池。
+   （發現的方式：截圖時瀏覽器擴充的 script injection 連續逾時，
+     頁面主執行緒被這個迴圈占著。） */
+function tickWhilePlaying(){
+  if(au.paused) return;          // 暫停就讓迴圈自然結束，不留 rAF 在跑
+  draw();
+  requestAnimationFrame(tickWhilePlaying);
+}
+au.addEventListener('play',()=>requestAnimationFrame(tickWhilePlaying));
+au.addEventListener('pause',draw);
+au.addEventListener('seeked',draw);
+au.addEventListener('loadedmetadata',draw);
 
 $('#seg').onchange=e=>pick(e.target.value);
 $('#play').onclick=()=>au.paused?au.play():au.pause();
 $('#rate').onchange=e=>au.playbackRate=+e.target.value;
-au.ontimeupdate=()=>$('#pos').textContent=abs(au.currentTime).toFixed(1)+'s';
+au.ontimeupdate=()=>{$('#pos').textContent=abs(au.currentTime).toFixed(1)+'s'; draw();};
 $('#mark').onclick=()=>$('#ts').value=abs(au.currentTime);
 $('#end').onclick=()=>$('#te').value=abs(au.currentTime);
 $('#replay').onclick=()=>{const s=parseFloat($('#ts').value);if(!isNaN(s)){au.currentTime=rel(s);au.play();}};
