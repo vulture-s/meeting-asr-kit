@@ -20,6 +20,7 @@
 !docs/
 !docs/**/*.md
 !docs/**/*.png
+!docs/**/*.jpg
 
 # 例外中的例外：快取與暫存不要
 __pycache__/
